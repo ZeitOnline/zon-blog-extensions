@@ -1,4 +1,4 @@
-# ZEIT ONLINE Blog Extensions
+=== ZEIT ONLINE Blog Extensions ===
 Tags: ZEIT ONLINE
 Requires at least: 4.9
 Tested up to: 4.9.1
@@ -8,6 +8,5 @@ License URI: http://www.gnu.org/licenses/gpl-3.0.txt
 
 Add ZEIT ONLINE specific options to wordpress weblogs
 
-## Installation
+== Installation ==
 Install the plugin from the git repository using the github-updater plugin.
-
