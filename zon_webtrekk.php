@@ -8,28 +8,43 @@
  * License URI:       http://www.gnu.org/licenses/gpl-3.0.txt
 */
 
+function jwt_decode( $token ) {
+	$base64Url = explode('.', $token)[1];
+	$search = ['-', '_'];
+	$replace = ['+', '/'];
+	$base64 = str_replace($search, $replace, $base64Url);
+	return json_encode(base64_decode( $base64 ));
+}
+
 function webtrekk_tracking_code() {
 	/* collect variables */
-	$sso_user_data = z_auth_decode_master_cookie();
-	$sso_id = isset($sso_user_data->id) ? $sso_user_data->id : null;
+	$sso_user_data = FALSE;
+	$user_login_status = 'nicht_angemeldet';
+	if (isset($_COOKIE[ 'zeit_sso_201501' ])) {
+		$cookie = $_COOKIE[ 'zeit_sso_201501' ];
+		$sso_user_data = jwt_decode( $cookie );
+	}
 
 	/* Track login status with entrypoint url */
-	$user_login_status = 'nicht_angemeldet';
+	if( $sso_user_data ) {
+		$sso_id = isset($sso_user_data->id) ? $sso_user_data->id : null;
+		if ($sso_id) {
+			$user_login_status = 'angemeldet';
 
-	if ($sso_id) {
-		$user_login_status = 'angemeldet';
-
-		if (!empty($sso_user_data->entry_url)) {
-			$user_login_status += sprintf('|%s', urldecode($sso_user_data->entry_url));
+			if (!empty($sso_user_data->entry_url)) {
+				$user_login_status += sprintf('|%s', urldecode($sso_user_data->entry_url));
+			}
 		}
 	}
+
+
 
 	/* we need to user $_SERVER here, because the_permalink() and similar WP functions
 	   return the wrong urls as our Freitext-Blog is accesible at www.zeit.de/blog/freitext
 	   via Varnish but has blog.zeit.de/freitext as its internal url */
 	$current_url = $_SERVER['HTTP_HOST'] . strtok($_SERVER['REQUEST_URI'],'?');
 
-	$wt_script_path   = 'http://scripts.zeit.de/static/js/webtrekk/webtrekk_v3.js';
+	$wt_script_path   = '//scripts.zeit.de/static/js/webtrekk/webtrekk_v3.js';
 	$wt_division      = 'redaktion'; // 'redaktion' or 'verlag'
 	$wt_ressort       = mb_strtolower( get_option( 'zon_ressort_main' ) );
 	$wt_subressort    = mb_strtolower( get_option( 'zon_ressort_sub' ) );
