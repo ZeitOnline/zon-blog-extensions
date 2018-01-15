@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Blog Options
  * Plugin URI:        https://github.com/ZeitOnline/zon-blog-extensions
  * Description:       Add ZEIT ONLINE specific options to wordpress weblogs
- * Version:           1.1.0
+ * Version:           1.1.1
  * Author:            Arne Seemann, Moritz Stoltenburg
  * Author URI:        http://www.zeit.de
  * License:           GPL-3.0+

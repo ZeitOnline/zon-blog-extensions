@@ -19,6 +19,7 @@ function jwt_decode( $token ) {
 function webtrekk_tracking_code() {
 	/* collect variables */
 	$sso_user_data = FALSE;
+	$sso_id = NULL;
 	$user_login_status = 'nicht_angemeldet';
 	if (isset($_COOKIE[ 'zeit_sso_201501' ])) {
 		$cookie = $_COOKIE[ 'zeit_sso_201501' ];
