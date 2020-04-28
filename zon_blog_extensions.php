@@ -42,8 +42,9 @@ class ZonOptionsPage
 
 		register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
 
-		// delete formerly registered option
+		// delete formerly registered options
 		delete_option( 'zon_gdpr_activated' );
+		delete_option( 'zon_ads_deactivated' );
 	}
 
 	/**
@@ -69,7 +70,7 @@ class ZonOptionsPage
 		// Set class property
 		$this->_ressort  = get_option( 'zon_blog_ressort' ); // Option name
 		$this->_ad_id    = get_option( 'zon_bannerkennung' );
-		$this->_no_ads 	 = get_option( 'zon_ads_deactivated' );
+		$this->_no_ads 	 = get_option( 'zon_ads_no_ads' );
 		$this->_p_length = get_option( 'zon_ads_paragraph_length', 200 );
 
 		?>
@@ -112,7 +113,7 @@ class ZonOptionsPage
 
 		register_setting(
 			'zon_blog_options',
-			'zon_ads_deactivated',
+			'zon_ads_no_ads',
 			'intval'
 		);
 
@@ -172,12 +173,12 @@ class ZonOptionsPage
 		);
 
 		add_settings_field(
-			'zon_ads_deactivated',
+			'zon_ads_no_ads',
 			'Ads deaktiviert (nur nach Absprache mit CR und GF!)',
 			array( $this, 'render_field' ),
 			'zon-options-page',
 			'settings_ads',
-			array( 'id' => 'zon_ads_deactivated' )
+			array( 'id' => 'zon_ads_no_ads' )
 		);
 
 	}
@@ -230,7 +231,7 @@ class ZonOptionsPage
 				);
 				break;
 
-			case 'zon_ads_deactivated':
+			case 'zon_ads_no_ads':
 				printf(
 					'<label><input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s> Ads deaktiviert.</label><p class="description">%3$s</p>',
 					$args['id'],
