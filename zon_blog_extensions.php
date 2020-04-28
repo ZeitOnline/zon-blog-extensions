@@ -25,7 +25,6 @@ class ZonOptionsPage
 	private $_ressort;
 	private $_ad_id;
 	private $_p_length;
-	private $_gdpr_act;
 
 	private $_zon_navigation_url = 'http://static.zeit.de/data/navigation-v2.xml';
 
@@ -42,6 +41,9 @@ class ZonOptionsPage
 		add_action( 'add_option_zon_blog_ressort', array( $this, 'convert_ressort_option' ), 10, 2 );
 
 		register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
+
+		// delete formerly registered option
+		delete_option( 'zon_gdpr_activated' );
 	}
 
 	/**
@@ -69,7 +71,6 @@ class ZonOptionsPage
 		$this->_ad_id    = get_option( 'zon_bannerkennung' );
 		$this->_no_ads 	 = get_option( 'zon_ads_deactivated' );
 		$this->_p_length = get_option( 'zon_ads_paragraph_length', 200 );
-		$this->_gdpr_act = get_option( 'zon_gdpr_activated', 1 );
 
 		?>
 		<div class="wrap">
@@ -121,12 +122,6 @@ class ZonOptionsPage
 			'intval'
 		);
 
-		register_setting(
-			'zon_blog_options',
-			'zon_gdpr_activated',
-			'intval'
-		);
-
 		/**
 		 * Add sections
 		 */
@@ -141,13 +136,6 @@ class ZonOptionsPage
 		add_settings_section(
 			'settings_ads',
 			'Produktmanagement',
-			null,
-			'zon-options-page'
-		);
-
-		add_settings_section(
-			'settings_gdpr',
-			'Datenschutz',
 			null,
 			'zon-options-page'
 		);
@@ -190,15 +178,6 @@ class ZonOptionsPage
 			'zon-options-page',
 			'settings_ads',
 			array( 'id' => 'zon_ads_deactivated' )
-		);
-
-		add_settings_field(
-			'zon_gdpr_activated',
-			'DSGVO Infolayer',
-			array( $this, 'render_field' ),
-			'zon-options-page',
-			'settings_gdpr',
-			array( 'id' => 'zon_gdpr_activated' )
 		);
 
 	}
@@ -261,15 +240,6 @@ class ZonOptionsPage
 						'Geschäftsführung auf das Deaktivieren von Ads geeinigt haben. Bitte nicht selbständig aktivieren. ' .
 						'Ist der Haken gesetzt, werden - sofern das Theme darauf vorbereitet ist - keine Anzeigen ausgespielt.'
 					)
-				);
-				break;
-
-			case 'zon_gdpr_activated':
-				printf(
-					'<label><input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s> DSGVO Infolayer aktiviert.</label><p class="description">%3$s</p>',
-					$args['id'],
-					checked( 1, $this->_gdpr_act, false ),
-					'Es wird ein Infolayer angezeigt, der auf die Nutzung von Cookies hinweist. Dieser muss zusammen mit dem Seitenrahmen geholt werden.'
 				);
 				break;
 		}
@@ -414,13 +384,6 @@ if ( is_admin() ) {
  */
 require plugin_dir_path( __FILE__ ) . 'zon_webtrekk.php';
 add_action( 'wp_footer', 'webtrekk_tracking_code' );
-
-
-/**
- * add GDPR Layer
- */
-require plugin_dir_path( __FILE__ ) . 'zon_gdpr_layer.php';
-add_action( 'zon_theme_after_opening_body', 'gdpr_layer' );
 
 /**
  * register IVW tracking
