@@ -5,7 +5,7 @@
  * Plugin Name:       ZEIT ONLINE Blog Options
  * Plugin URI:        https://github.com/ZeitOnline/zon-blog-extensions
  * Description:       Add ZEIT ONLINE specific options to wordpress weblogs
- * Version:           1.2
+ * Version:           1.3.0
  * Author:            Arne Seemann, Moritz Stoltenburg, Nico Brünjes
  * Author URI:        http://www.zeit.de
  * License:           GPL-3.0+
@@ -25,7 +25,6 @@ class ZonOptionsPage
 	private $_ressort;
 	private $_ad_id;
 	private $_p_length;
-	private $_gdpr_act;
 
 	private $_zon_navigation_url = 'http://static.zeit.de/data/navigation-v2.xml';
 
@@ -42,6 +41,10 @@ class ZonOptionsPage
 		add_action( 'add_option_zon_blog_ressort', array( $this, 'convert_ressort_option' ), 10, 2 );
 
 		register_activation_hook( __FILE__, array( $this, 'plugin_activation' ) );
+
+		// delete formerly registered options
+		delete_option( 'zon_gdpr_activated' );
+		delete_option( 'zon_ads_deactivated' );
 	}
 
 	/**
@@ -67,9 +70,8 @@ class ZonOptionsPage
 		// Set class property
 		$this->_ressort  = get_option( 'zon_blog_ressort' ); // Option name
 		$this->_ad_id    = get_option( 'zon_bannerkennung' );
-		$this->_no_ads 	 = get_option( 'zon_ads_deactivated' );
+		$this->_no_ads 	 = get_option( 'zon_ads_no_ads' );
 		$this->_p_length = get_option( 'zon_ads_paragraph_length', 200 );
-		$this->_gdpr_act = get_option( 'zon_gdpr_activated', 1 );
 
 		?>
 		<div class="wrap">
@@ -111,19 +113,13 @@ class ZonOptionsPage
 
 		register_setting(
 			'zon_blog_options',
-			'zon_ads_deactivated',
+			'zon_ads_no_ads',
 			'intval'
 		);
 
 		register_setting(
 			'zon_blog_options',
 			'zon_ads_paragraph_length',
-			'intval'
-		);
-
-		register_setting(
-			'zon_blog_options',
-			'zon_gdpr_activated',
 			'intval'
 		);
 
@@ -141,13 +137,6 @@ class ZonOptionsPage
 		add_settings_section(
 			'settings_ads',
 			'Produktmanagement',
-			null,
-			'zon-options-page'
-		);
-
-		add_settings_section(
-			'settings_gdpr',
-			'Datenschutz',
 			null,
 			'zon-options-page'
 		);
@@ -184,21 +173,12 @@ class ZonOptionsPage
 		);
 
 		add_settings_field(
-			'zon_ads_deactivated',
+			'zon_ads_no_ads',
 			'Ads deaktiviert (nur nach Absprache mit CR und GF!)',
 			array( $this, 'render_field' ),
 			'zon-options-page',
 			'settings_ads',
-			array( 'id' => 'zon_ads_deactivated' )
-		);
-
-		add_settings_field(
-			'zon_gdpr_activated',
-			'DSGVO Infolayer',
-			array( $this, 'render_field' ),
-			'zon-options-page',
-			'settings_gdpr',
-			array( 'id' => 'zon_gdpr_activated' )
+			array( 'id' => 'zon_ads_no_ads' )
 		);
 
 	}
@@ -251,7 +231,7 @@ class ZonOptionsPage
 				);
 				break;
 
-			case 'zon_ads_deactivated':
+			case 'zon_ads_no_ads':
 				printf(
 					'<label><input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s> Ads deaktiviert.</label><p class="description">%3$s</p>',
 					$args['id'],
@@ -261,15 +241,6 @@ class ZonOptionsPage
 						'Geschäftsführung auf das Deaktivieren von Ads geeinigt haben. Bitte nicht selbständig aktivieren. ' .
 						'Ist der Haken gesetzt, werden - sofern das Theme darauf vorbereitet ist - keine Anzeigen ausgespielt.'
 					)
-				);
-				break;
-
-			case 'zon_gdpr_activated':
-				printf(
-					'<label><input type="checkbox" id="%1$s" name="%1$s" value="1" %2$s> DSGVO Infolayer aktiviert.</label><p class="description">%3$s</p>',
-					$args['id'],
-					checked( 1, $this->_gdpr_act, false ),
-					'Es wird ein Infolayer angezeigt, der auf die Nutzung von Cookies hinweist. Dieser muss zusammen mit dem Seitenrahmen geholt werden.'
 				);
 				break;
 		}
@@ -414,13 +385,6 @@ if ( is_admin() ) {
  */
 require plugin_dir_path( __FILE__ ) . 'zon_webtrekk.php';
 add_action( 'wp_footer', 'webtrekk_tracking_code' );
-
-
-/**
- * add GDPR Layer
- */
-require plugin_dir_path( __FILE__ ) . 'zon_gdpr_layer.php';
-add_action( 'zon_theme_after_opening_body', 'gdpr_layer' );
 
 /**
  * register IVW tracking
