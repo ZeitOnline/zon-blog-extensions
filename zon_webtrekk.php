@@ -45,7 +45,7 @@ function webtrekk_tracking_code() {
 	   via Varnish but has blog.zeit.de/freitext as its internal url */
 	$current_url = $_SERVER['HTTP_HOST'] . strtok($_SERVER['REQUEST_URI'],'?');
 
-	$wt_script_path   = '//scripts.zeit.de/static/js/webtrekk/webtrekk_v3.js';
+	$wt_script_path   = '//static.zeit.de/static/js/webtrekk/webtrekk_v3.js';
 	$wt_division      = 'redaktion'; // 'redaktion' or 'verlag'
 	$wt_ressort       = mb_strtolower( get_option( 'zon_ressort_main' ) );
 	$wt_subressort    = mb_strtolower( get_option( 'zon_ressort_sub' ) );
